@@ -1,4 +1,4 @@
-Version: extensions/v1beta1
+apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   name: my-php7-server
@@ -12,19 +12,18 @@ spec:
     spec:
       containers:
       - name: my-php7-server
-        image: docker.io/ameng/php7-apache2
+        image: docker.io/spolise/php-frontend:002
         env:
         - name: DB_HOST
-          value: mysql-service.default.svc.cluster.local
+          value: mysql
         - name: DB_NAME
-          value: demo
+          value: mysql
         - name: DB_USER
-          value: root
+          value: todos-user
+        - name: DB_ROOT_PWD
+          value: dummypassword
         - name: DB_PWD
-          valueFrom:
-            secretKeyRef:
-              name: mysql-pass
-              key: password.txt
+          value: dummytodos
         ports:
         - containerPort: 80
 ---
@@ -33,10 +32,11 @@ apiVersion: v1
 metadata:
   name: my-php7-server
 spec:
+  type: LoadBalancer
   selector:
     app: my-php7-server
   ports:
     - name: php
       protocol: TCP
       port: 80
-      targetPort: 80targetPort: 80
+      targetPort: 80
